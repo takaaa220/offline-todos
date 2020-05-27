@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@emotion/core": "^10.0.28",
+    "emotion-theming": "^10.0.27",
     "react": "0.0.0-experimental-aae83a4b9",
     "react-dom": "0.0.0-experimental-aae83a4b9"
   }
