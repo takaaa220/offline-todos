@@ -1,0 +1,23 @@
+{
+  "name": "offline-todos",
+  "license": "MIT",
+  "scripts": {
+    "dev": "webpack-dev-server --config config/webpack.config.js --open",
+    "build": "webpack --config config/prod.webpack.config.js"
+  },
+  "devDependencies": {
+    "@types/react": "16.9.25",
+    "@types/react-dom": "16.9.5",
+    "html-webpack-plugin": "^4.3.0",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "react": "0.0.0-experimental-aae83a4b9",
+    "react-dom": "0.0.0-experimental-aae83a4b9"
+  }
+}
