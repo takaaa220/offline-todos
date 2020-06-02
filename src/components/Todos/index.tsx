@@ -1,4 +1,12 @@
-import React, { FC, useState, FormEvent, useCallback, ChangeEvent } from "react";
+import React, {
+  FC,
+  useState,
+  FormEvent,
+  useCallback,
+  ChangeEvent,
+  useTransition,
+  Suspense,
+} from "react";
 import { Todo } from "~/db/todo";
 import { css } from "@emotion/core";
 import { useAppActions } from "~/containers/App/states";
@@ -9,17 +17,17 @@ type Props = {
 
 type ItemProps = {
   todo: Todo;
+  changing: boolean;
+  onCheck: (id: string, done: boolean) => void;
 };
 
-const AddTodo: FC = () => {
+type AddTodoProps = {
+  adding: boolean;
+  onSubmit: (value: string) => void;
+};
+
+const AddTodo: FC<AddTodoProps> = ({ onSubmit, adding }) => {
   const [value, setValue] = useState("");
-  const { addTodo } = useAppActions();
-
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
-    [],
-  );
-
   const handleSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
@@ -27,10 +35,15 @@ const AddTodo: FC = () => {
 
       if (!_value) return;
 
-      addTodo(_value);
+      onSubmit(_value);
       setValue("");
     },
-    [value, addTodo],
+    [value, onSubmit],
+  );
+
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
+    [],
   );
 
   return (
@@ -40,6 +53,7 @@ const AddTodo: FC = () => {
           type="text"
           name="value"
           value={value}
+          disabled={adding}
           onChange={handleChange}
           css={inputTextStyle}
           placeholder="+ Add a todo"
@@ -49,30 +63,51 @@ const AddTodo: FC = () => {
   );
 };
 
-const Item: FC<ItemProps> = ({ todo }) => {
-  const { changeStatusTodo } = useAppActions();
-
+const Item: FC<ItemProps> = ({ todo, changing, onCheck }) => {
   const handleCheck = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      changeStatusTodo(todo.id, e.currentTarget.checked);
+      if (changing) return;
+
+      onCheck(todo.id, e.currentTarget.checked);
     },
-    [todo.id, changeStatusTodo],
+    [todo.id, onCheck, changing],
   );
 
   return (
     <li css={itemStyle} data-done={todo.done}>
-      <input type="checkbox" checked={todo.done} css={checkStyle} onChange={handleCheck} />
+      <input
+        type="checkbox"
+        checked={todo.done}
+        css={checkStyle}
+        onChange={handleCheck}
+        disabled={changing}
+      />
       {todo.value}
     </li>
   );
 };
 
 export const Todos: FC<Props> = ({ todos }) => {
+  const { addTodo, changeStatusTodo } = useAppActions();
+  const [startAddTransition, adding] = useTransition({
+    timeoutMs: 10000,
+  });
+  const handleAddTodo = useCallback(
+    (value: string) => {
+      addTodo(value, startAddTransition);
+    },
+    [addTodo, startAddTransition],
+  );
+  const [startChangeStatusTransition, changing] = useTransition({ timeoutMs: 10000 });
+  const handleChangeStatus = useCallback((id: string, done: boolean) => {
+    changeStatusTodo({ id, done, startTransition: startChangeStatusTransition });
+  }, []);
+
   return (
     <ul css={listStyle}>
-      <AddTodo />
+      <AddTodo onSubmit={handleAddTodo} adding={adding} />
       {todos.map((todo) => (
-        <Item key={todo.id} todo={todo} />
+        <Item key={todo.id} todo={todo} onCheck={handleChangeStatus} changing={changing} />
       ))}
     </ul>
   );

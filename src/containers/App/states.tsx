@@ -1,6 +1,14 @@
 import { Fetcher } from "~/helpers/fetcher";
 import { Todo, getTodos, addTodo, changeStatusTodos } from "~/db/todo";
-import { useState, useContext, createContext, useCallback, FC, useTransition } from "react";
+import {
+  useState,
+  useContext,
+  createContext,
+  useCallback,
+  FC,
+  useTransition,
+  TransitionStartFunction,
+} from "react";
 
 export type AppPage =
   | {
@@ -81,33 +89,52 @@ const manageAppStates = () => {
           },
         }));
       },
-      addTodo: async (value: string) => {
-        await addTodo(value);
+      addTodo: async (value: string, startTransition: TransitionStartFunction) => {
+        const todosFetcher = new Fetcher(async () => {
+          await addTodo(value);
 
-        setState(
-          (state) => ({
-            ...state,
-            page: {
-              type: "todos",
-              todosFetcher: new Fetcher(getTodos),
-            },
-          }),
-          true,
-        );
+          return getTodos();
+        });
+
+        startTransition(() => {
+          setState(
+            (state) => ({
+              ...state,
+              page: {
+                type: "todos",
+                todosFetcher,
+              },
+            }),
+            true,
+          );
+        });
       },
-      changeStatusTodo: async (id: string, done: boolean) => {
-        await changeStatusTodos(id, done);
+      changeStatusTodo: async ({
+        id,
+        done,
+        startTransition,
+      }: {
+        id: string;
+        done: boolean;
+        startTransition: TransitionStartFunction;
+      }) => {
+        const todosFetcher = new Fetcher(async () => {
+          await changeStatusTodos(id, done);
 
-        setState(
-          (state) => ({
-            ...state,
-            page: {
-              type: "todos",
-              todosFetcher: new Fetcher(getTodos),
-            },
-          }),
-          true,
-        );
+          return getTodos();
+        });
+
+        startTransition(() => {
+          setState((state) => {
+            return {
+              ...state,
+              page: {
+                type: "todos",
+                todosFetcher,
+              },
+            };
+          }, true);
+        });
       },
     };
   };
