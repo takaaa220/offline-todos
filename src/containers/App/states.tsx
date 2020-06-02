@@ -1,14 +1,6 @@
 import { Fetcher } from "~/helpers/fetcher";
 import { Todo, getTodos, addTodo, changeStatusTodos } from "~/db/todo";
-import {
-  useState,
-  useContext,
-  createContext,
-  useCallback,
-  FC,
-  SetStateAction,
-  Dispatch,
-} from "react";
+import { useState, useContext, createContext, useCallback, FC, useTransition } from "react";
 
 export type AppPage =
   | {
@@ -23,9 +15,11 @@ export type AppState = {
   page: AppPage;
 };
 
+type UpdateFunction = (updater: (prev: AppState) => AppState, transition?: boolean) => void;
+
 type ContextValue = {
   state: AppState;
-  setState: Dispatch<SetStateAction<AppState>>;
+  setState: UpdateFunction;
 };
 
 const initialState = (): AppState => ({
@@ -48,12 +42,30 @@ const manageAppStates = () => {
 
   const useAppStates = () => {
     const [state, setState] = useState<AppState>(initialState());
+    const [startTransition, isPending] = useTransition({
+      timeoutMs: 10000,
+    });
+
+    const handleChange = useCallback<UpdateFunction>(
+      (updater, transition = false) => {
+        if (transition) {
+          startTransition(() => {
+            setState(updater);
+          });
+        } else {
+          setState(updater);
+        }
+      },
+      [setState, startTransition],
+    );
 
     const Provider = useCallback<FC>(({ children }) => {
-      return <Context.Provider value={{ state, setState }}>{children}</Context.Provider>;
+      return (
+        <Context.Provider value={{ state, setState: handleChange }}>{children}</Context.Provider>
+      );
     }, []);
 
-    return { state, Provider };
+    return { state, Provider, isPending };
   };
 
   const useAppActions = () => {
@@ -72,24 +84,30 @@ const manageAppStates = () => {
       addTodo: async (value: string) => {
         await addTodo(value);
 
-        setState((state) => ({
-          ...state,
-          page: {
-            type: "todos",
-            todosFetcher: new Fetcher(getTodos),
-          },
-        }));
+        setState(
+          (state) => ({
+            ...state,
+            page: {
+              type: "todos",
+              todosFetcher: new Fetcher(getTodos),
+            },
+          }),
+          true,
+        );
       },
       changeStatusTodo: async (id: string, done: boolean) => {
         await changeStatusTodos(id, done);
 
-        setState((state) => ({
-          ...state,
-          page: {
-            type: "todos",
-            todosFetcher: new Fetcher(getTodos),
-          },
-        }));
+        setState(
+          (state) => ({
+            ...state,
+            page: {
+              type: "todos",
+              todosFetcher: new Fetcher(getTodos),
+            },
+          }),
+          true,
+        );
       },
     };
   };

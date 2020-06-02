@@ -14,6 +14,7 @@ export type Todo = {
 
 export const getTodos = async (): Promise<Todo[]> => {
   const db = await openDb();
+  console.log("open db");
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(todoStore.name, "readonly");
@@ -24,7 +25,8 @@ export const getTodos = async (): Promise<Todo[]> => {
     const req: IDBRequest<Todo[]> = index.getAll();
 
     req.onsuccess = () => {
-      resolve(req.result);
+      console.log("success get todos");
+      setTimeout(() => resolve(req.result), 1000);
     };
   });
 };
@@ -52,9 +54,8 @@ const getTodo = async (id: Todo["id"]): Promise<Todo> => {
 };
 
 export const changeStatusTodos = async (id: Todo["id"], done: Todo["done"]): Promise<Todo> => {
-  const [todo, db] = await Promise.all<Todo, IDBDatabase>([getTodo(id), openDb()]).catch(() =>
-    Promise.reject("not found"),
-  );
+  const db = await openDb();
+  const todo = await getTodo(id);
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(todoStore.name, "readwrite");
@@ -63,14 +64,15 @@ export const changeStatusTodos = async (id: Todo["id"], done: Todo["done"]): Pro
     const store = transaction.objectStore(todoStore.name);
 
     const newTodo = {
-      ...todo.result,
+      ...todo,
       done,
     };
 
-    const req: IDBRequest<Todo> = store.put(newTodo);
+    const req: IDBRequest = store.put(newTodo);
 
     req.onsuccess = () => {
-      resolve(req.result);
+      console.log("success");
+      resolve(newTodo);
     };
   });
 };
