@@ -6,6 +6,9 @@ export const lightTheme: Theme = {
   darkAccent: "#ccc",
   char: "#212120",
   back: "#fafafa",
+  border: "gray",
+  darkBorder: "darkgray",
+  lightBorder: "lightgray",
 };
 
 export const darkTheme: Theme = {
@@ -15,4 +18,7 @@ export const darkTheme: Theme = {
   darkAccent: "#000ccc",
   char: "#fafafa",
   back: "#212120",
+  border: "#eee",
+  lightBorder: "#efefef",
+  darkBorder: "#ccc",
 };

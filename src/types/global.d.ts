@@ -5,4 +5,7 @@ type Theme = {
   darkAccent: string;
   char: string;
   back: string;
+  border: string;
+  darkBorder: string;
+  lightBorder: string;
 };

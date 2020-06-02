@@ -8,9 +8,7 @@ export const TopPage: FC = () => {
   const { goToTodos } = useAppActions();
 
   useEffect(() => {
-    if (isValidBrowser) {
-      goToTodos();
-    }
+    if (isValidBrowser) goToTodos();
   }, []);
 
   return isValidBrowser ? <></> : <Alert />;

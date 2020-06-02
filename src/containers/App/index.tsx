@@ -1,5 +1,4 @@
 import React, { FC, useEffect } from "react";
-import { css } from "@emotion/core";
 import { useThemeMode } from "~/components/ThemeProvider";
 import { useAppStates } from "./states";
 import { TopPage } from "../Top";
@@ -18,14 +17,10 @@ export const App: FC = () => {
 
   return (
     <Provider>
-      <div css={wrapper}>hello world</div>
-      {state.page.type === "top" && <TopPage />}
-      {state.page.type === "todos" && <TodosPage todosFetcher={state.page.todosFetcher} />}
+      <main>
+        {state.page.type === "top" && <TopPage />}
+        {state.page.type === "todos" && <TodosPage todosFetcher={state.page.todosFetcher} />}
+      </main>
     </Provider>
   );
 };
-
-const wrapper = (theme: Theme) => css`
-  color: ${theme.primary};
-  width: 100%;
-`;

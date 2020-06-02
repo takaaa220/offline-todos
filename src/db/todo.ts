@@ -24,7 +24,6 @@ export const getTodos = async (): Promise<Todo[]> => {
     const req: IDBRequest<Todo[]> = index.getAll();
 
     req.onsuccess = () => {
-      console.log("success");
       resolve(req.result);
     };
   });

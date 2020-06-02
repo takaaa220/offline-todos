@@ -1,5 +1,5 @@
 import { Fetcher } from "~/helpers/fetcher";
-import { Todo, getTodos, addTodo } from "~/db/todo";
+import { Todo, getTodos, addTodo, changeStatusTodos } from "~/db/todo";
 import {
   useState,
   useContext,
@@ -9,10 +9,6 @@ import {
   SetStateAction,
   Dispatch,
 } from "react";
-
-// import { Fetcher } from "~/helpers/fetcher";
-// import { Todo, getTodos, addTodo, todoStore } from "~/db/todo";
-// import { generateStateManagenentTools } from "~/helpers/states";
 
 export type AppPage =
   | {
@@ -69,7 +65,7 @@ const manageAppStates = () => {
           ...state,
           page: {
             type: "todos",
-            todosFetcher: new Fetcher<Todo[]>(getTodos),
+            todosFetcher: new Fetcher(getTodos),
           },
         }));
       },
@@ -80,7 +76,18 @@ const manageAppStates = () => {
           ...state,
           page: {
             type: "todos",
-            todosFetcher: new Fetcher(() => getTodos()),
+            todosFetcher: new Fetcher(getTodos),
+          },
+        }));
+      },
+      changeStatusTodo: async (id: string, done: boolean) => {
+        await changeStatusTodos(id, done);
+
+        setState((state) => ({
+          ...state,
+          page: {
+            type: "todos",
+            todosFetcher: new Fetcher(getTodos),
           },
         }));
       },
@@ -91,45 +98,3 @@ const manageAppStates = () => {
 };
 
 export const { useAppStates, useAppActions } = manageAppStates();
-
-// export type AppState = {
-//   page: AppPage;
-// };
-
-// export type AppPage =
-//   | {
-//       type: "top";
-//     }
-//   | {
-//       type: "todos";
-//       todosFetcher: Fetcher<Todo[]>;
-//     };
-
-// const getInitialState = (): AppState => ({
-//   page: {
-//     type: "top",
-//   },
-// });
-
-// export const {
-//   useManagedState: useAppStates,
-//   useActions: useAppActions,
-// } = generateStateManagenentTools({
-//   getInitialState,
-//   getActions: (setState) => ({
-//     getTodos: () => {
-//       setState((state) => ({
-//         ...state,
-//         todoFetcher: new Fetcher(() => getTodos()),
-//       }));
-//     },
-//     addTodo: async (value: string) => {
-//       await addTodo(value);
-
-//       setState((state) => ({
-//         ...state,
-//         todosFetcher: new Fetcher(() => getTodos()),
-//       }));
-//     },
-//   }),
-// });

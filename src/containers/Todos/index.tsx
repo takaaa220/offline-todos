@@ -1,6 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import { Fetcher } from "~/helpers/fetcher";
 import { Todo } from "~/db/todo";
+import { Todos } from "~/components/Todos";
+import { css } from "@emotion/core";
 
 type Props = {
   todosFetcher: Fetcher<Todo[]>;
@@ -8,13 +10,26 @@ type Props = {
 
 export const TodosPage: FC<Props> = ({ todosFetcher }) => {
   const todos = todosFetcher.get();
-  console.log(todos);
+  const sortedTodos = useMemo(
+    () => [...todos.filter((todo) => !todo.done), ...todos.filter((todo) => todo.done)],
+    [todos],
+  );
 
   return (
-    <ul>
-      {todos.map((todo) => (
-        <li key={todo.id}>{todo.value}</li>
-      ))}
-    </ul>
+    <section css={wrapperStyle}>
+      <h1 css={headingStyle}>Todos</h1>
+      <Todos todos={sortedTodos} />
+    </section>
   );
 };
+
+const wrapperStyle = css`
+  max-width: 760px;
+  padding: 40px 16px;
+  margin: 0 auto;
+`;
+
+const headingStyle = css`
+  font-weight: bold;
+  font-size: 2.4rem;
+`;

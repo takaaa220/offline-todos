@@ -13,7 +13,6 @@ export const openDb = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     req.onsuccess = () => {
       dbCache = req.result;
-      console.log("resolve");
       resolve(dbCache);
     };
     req.onerror = () => {
