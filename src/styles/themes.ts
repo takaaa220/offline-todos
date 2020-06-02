@@ -4,8 +4,8 @@ export const lightTheme: Theme = {
   darkPrimary: "#aa",
   accent: "#bbb",
   darkAccent: "#ccc",
-  char: "green",
-  back: "red",
+  char: "#212120",
+  back: "#fafafa",
 };
 
 export const darkTheme: Theme = {
@@ -13,6 +13,6 @@ export const darkTheme: Theme = {
   darkPrimary: "#0aa",
   accent: "#bbb000",
   darkAccent: "#000ccc",
-  char: "red",
-  back: "green",
+  char: "#fafafa",
+  back: "#212120",
 };

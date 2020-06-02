@@ -1,24 +1,19 @@
-import React, { FC } from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import { App } from "./containers/App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Global } from "@emotion/core";
 import { globalStyle } from "./styles/global";
 import { ModeProvider } from "./components/ThemeProvider";
-
-const Alert: FC = ({ children }) => {
-  if (window.indexedDB) return <>{children}</>;
-
-  return <p>このブラウザーではこのアプリケーションを使うことができません．．．</p>;
-};
+import { PageLoader } from "./components/Loader";
 
 const BootStrap = () => (
   <ErrorBoundary>
     <ModeProvider>
-      <Global styles={globalStyle} />
-      <Alert>
+      <Suspense fallback={<PageLoader />}>
+        <Global styles={globalStyle} />
         <App />
-      </Alert>
+      </Suspense>
     </ModeProvider>
   </ErrorBoundary>
 );

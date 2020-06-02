@@ -146,7 +146,12 @@ const reset = css`
   }
 `;
 
-export const globalStyle = css`
-  ${reset};
-  ${app};
-`;
+export const globalStyle = (theme: Theme) =>
+  css`
+    ${reset};
+    ${app};
+    body {
+      background-color: ${theme.back};
+      color: ${theme.char};
+    }
+  `;
