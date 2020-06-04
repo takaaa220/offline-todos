@@ -7,11 +7,11 @@ import React, {
   Suspense,
   FC,
 } from "react";
-import { useAppActions } from "~/containers/App/states";
-import { TRANSITION_CONFIG } from "~/constants";
+import { css } from "@emotion/core";
 import { Loader } from "../Loader";
 import { itemBaseStyle } from ".";
-import { css } from "@emotion/core";
+import { useAppActions } from "~/containers/App/states";
+import { TRANSITION_CONFIG } from "~/constants";
 
 export const AddTodo: FC = () => {
   const [value, setValue] = useState("");

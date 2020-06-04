@@ -1,8 +1,8 @@
 import React, { FC, useMemo } from "react";
+import { css } from "@emotion/core";
 import { Fetcher } from "~/helpers/fetcher";
 import { Todo } from "~/db/todo";
 import { Todos } from "~/components/Todos";
-import { css } from "@emotion/core";
 
 type Props = {
   todosFetcher: Fetcher<Todo[]>;

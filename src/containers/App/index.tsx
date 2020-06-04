@@ -1,8 +1,8 @@
 import React, { FC, useEffect, Suspense } from "react";
-import { useThemeMode } from "~/components/ThemeProvider";
-import { useAppStates } from "./states";
 import { TopPage } from "../Top";
 import { TodosPage } from "../Todos";
+import { useAppStates } from "./states";
+import { useThemeMode } from "~/components/ThemeProvider";
 import { FixedLoader } from "~/components/Loader";
 
 export const App: FC = () => {

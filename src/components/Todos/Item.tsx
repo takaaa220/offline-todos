@@ -1,9 +1,9 @@
-import { Todo } from "~/db/todo";
 import React, { FC, useTransition, useCallback, ChangeEvent } from "react";
-import { useAppActions } from "~/containers/App/states";
-import { TRANSITION_CONFIG } from "~/constants";
 import { css } from "@emotion/core";
 import { itemBaseStyle } from ".";
+import { Todo } from "~/db/todo";
+import { useAppActions } from "~/containers/App/states";
+import { TRANSITION_CONFIG } from "~/constants";
 
 type ItemProps = {
   todo: Todo;

@@ -1,5 +1,3 @@
-import { Fetcher } from "~/helpers/fetcher";
-import { Todo, TodoDB } from "~/db/todo";
 import {
   useState,
   useContext,
@@ -9,6 +7,8 @@ import {
   useTransition,
   TransitionStartFunction,
 } from "react";
+import { Fetcher } from "~/helpers/fetcher";
+import { Todo, TodoDB } from "~/db/todo";
 import { TRANSITION_CONFIG } from "~/constants";
 
 export type AppPage =

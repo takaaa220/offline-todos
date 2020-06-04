@@ -1,8 +1,8 @@
 import React, { FC } from "react";
-import { Todo } from "~/db/todo";
 import { css } from "@emotion/core";
 import { AddTodo } from "./Add";
 import { Item } from "./Item";
+import { Todo } from "~/db/todo";
 
 type Props = {
   todos: Todo[];

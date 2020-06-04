@@ -1,8 +1,8 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
+import { Global } from "@emotion/core";
 import { App } from "./containers/App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Global } from "@emotion/core";
 import { globalStyle } from "./styles/global";
 import { ModeProvider } from "./components/ThemeProvider";
 import { PageLoader } from "./components/Loader";
