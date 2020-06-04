@@ -7,6 +7,20 @@ import { globalStyle } from "./styles/global";
 import { ModeProvider } from "./components/ThemeProvider";
 import { PageLoader } from "./components/Loader";
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js").then(
+      (registration) => {
+        console.log("ServiceWorker registration successful!");
+        console.table(registration);
+      },
+      (error) => {
+        console.log("ServiceWorker registration failed. ", error);
+      },
+    );
+  });
+}
+
 const BootStrap = () => (
   <ErrorBoundary>
     <ModeProvider>

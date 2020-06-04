@@ -23,11 +23,13 @@ const config = {
     },
   },
   plugins: [
-    new GenerateSW({
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "../public", "index.html"),
+    }),
+    new GenerateSW({
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      clientsClaim: true,
+      skipWaiting: true,
     }),
   ],
 };
