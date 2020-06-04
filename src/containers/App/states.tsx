@@ -132,6 +132,31 @@ const manageAppStates = () => {
           });
         });
       },
+      editTodo: async ({
+        id,
+        value,
+        startTransition,
+      }: {
+        id: Todo["id"];
+        value: Todo["value"];
+        startTransition: TransitionStartFunction;
+      }) => {
+        const todosFetcher = new Fetcher(async () => {
+          await TodoDB.update(id, { value });
+
+          return TodoDB.getAll();
+        });
+
+        startTransition(() => {
+          setState((state) => ({
+            ...state,
+            page: {
+              type: "todos",
+              todosFetcher,
+            },
+          }));
+        });
+      },
     };
   };
 
