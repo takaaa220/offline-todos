@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { GenerateSW } = require("workbox-webpack-plugin");
 
 const config = {
   entry: "./src/index.tsx",
@@ -22,6 +23,9 @@ const config = {
     },
   },
   plugins: [
+    new GenerateSW({
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "../public", "index.html"),
     }),
