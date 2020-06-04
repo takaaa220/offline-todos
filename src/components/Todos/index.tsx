@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import { css } from "@emotion/core";
 import { AddTodo } from "./Add";
 import { Item } from "./Item";
@@ -8,14 +8,27 @@ type Props = {
   todos: Todo[];
 };
 
-export const Todos: FC<Props> = ({ todos }) => (
-  <ul css={listStyle}>
-    <AddTodo />
-    {todos.map((todo) => (
-      <Item key={todo.id} todo={todo} />
-    ))}
-  </ul>
-);
+export const Todos: FC<Props> = ({ todos }) => {
+  const sortedTodos = useMemo(
+    () =>
+      todos.sort((a, b) => {
+        if (a.createdAt > b.createdAt) return -1;
+        if (a.createdAt < b.createdAt) return 1;
+
+        return 0;
+      }),
+    [todos],
+  );
+
+  return (
+    <ul css={listStyle}>
+      <AddTodo />
+      {sortedTodos.map((todo) => (
+        <Item key={todo.id} todo={todo} />
+      ))}
+    </ul>
+  );
+};
 
 const listStyle = (theme: Theme) => css`
   > li + li {

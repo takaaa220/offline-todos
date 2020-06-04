@@ -1,24 +1,24 @@
 // @TODO: Themeを設定する
 export const lightTheme: Theme = {
-  primary: "#afafaa",
-  darkPrimary: "#aa",
-  accent: "#bbb",
-  darkAccent: "#ccc",
+  primary: "#26a69a",
+  darkPrimary: "#00897b",
+  accent: "#FF7684",
+  darkAccent: "##D95965",
   char: "#212120",
   back: "#fafafa",
-  border: "gray",
-  darkBorder: "darkgray",
-  lightBorder: "lightgray",
+  border: "#a0a4ae",
+  darkBorder: "#b0bec5",
+  lightBorder: "#ccd0d0",
 };
 
 export const darkTheme: Theme = {
-  primary: "#a0afaa",
-  darkPrimary: "#0aa",
-  accent: "#bbb000",
-  darkAccent: "#000ccc",
+  primary: "#26a69a",
+  darkPrimary: "#00897b",
+  accent: "#FF7684",
+  darkAccent: "##D95965",
   char: "#fafafa",
   back: "#212120",
-  border: "#eee",
-  lightBorder: "#efefef",
-  darkBorder: "#ccc",
+  border: "#9e9e9e",
+  lightBorder: "#757575",
+  darkBorder: "#616161",
 };

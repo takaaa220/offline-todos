@@ -69,5 +69,14 @@ const inputTextStyle = (theme: Theme) => css`
   &:hover,
   &:focus {
     background-color: ${theme.lightBorder};
+    color: ${theme.char};
+
+    &::placeholder {
+      color: ${theme.border};
+    }
+  }
+
+  &::placeholder {
+    color: ${theme.darkBorder};
   }
 `;
