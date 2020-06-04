@@ -10,6 +10,8 @@ import React, {
 import { Todo } from "~/db/todo";
 import { css } from "@emotion/core";
 import { useAppActions } from "~/containers/App/states";
+import { Loader } from "../Loader";
+import { TRANSITION_CONFIG } from "~/constants";
 
 type Props = {
   todos: Todo[];
@@ -17,17 +19,15 @@ type Props = {
 
 type ItemProps = {
   todo: Todo;
-  changing: boolean;
-  onCheck: (id: string, done: boolean) => void;
 };
 
-type AddTodoProps = {
-  adding: boolean;
-  onSubmit: (value: string) => void;
-};
+type AddTodoProps = {};
 
-const AddTodo: FC<AddTodoProps> = ({ onSubmit, adding }) => {
+const AddTodo: FC<AddTodoProps> = () => {
   const [value, setValue] = useState("");
+  const { addTodo } = useAppActions();
+  const [startAddTransition, adding] = useTransition(TRANSITION_CONFIG);
+
   const handleSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
@@ -35,10 +35,10 @@ const AddTodo: FC<AddTodoProps> = ({ onSubmit, adding }) => {
 
       if (!_value) return;
 
-      onSubmit(_value);
+      addTodo(_value, startAddTransition);
       setValue("");
     },
-    [value, onSubmit],
+    [value, startAddTransition, addTodo],
   );
 
   const handleChange = useCallback(
@@ -48,36 +48,45 @@ const AddTodo: FC<AddTodoProps> = ({ onSubmit, adding }) => {
 
   return (
     <li>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="value"
-          value={value}
-          disabled={adding}
-          onChange={handleChange}
-          css={inputTextStyle}
-          placeholder="+ Add a todo"
-        />
-      </form>
+      <Suspense fallback={<Loader />}>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="value"
+            value={value}
+            disabled={adding}
+            onChange={handleChange}
+            css={inputTextStyle}
+            placeholder="+ Add a todo"
+          />
+        </form>
+      </Suspense>
     </li>
   );
 };
 
-const Item: FC<ItemProps> = ({ todo, changing, onCheck }) => {
+const Item: FC<ItemProps> = ({ todo }) => {
+  const { changeStatusTodo } = useAppActions();
+  const [startChangeStatusTransition, changing] = useTransition(TRANSITION_CONFIG);
+
   const handleCheck = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       if (changing) return;
 
-      onCheck(todo.id, e.currentTarget.checked);
+      changeStatusTodo({
+        id: todo.id,
+        done: e.currentTarget.checked,
+        startTransition: startChangeStatusTransition,
+      });
     },
-    [todo.id, onCheck, changing],
+    [todo.id, changing, changeStatusTodo, startChangeStatusTransition],
   );
 
   return (
     <li css={itemStyle} data-done={todo.done}>
       <input
         type="checkbox"
-        checked={todo.done}
+        checked={changing ? !todo.done : todo.done}
         css={checkStyle}
         onChange={handleCheck}
         disabled={changing}
@@ -87,31 +96,14 @@ const Item: FC<ItemProps> = ({ todo, changing, onCheck }) => {
   );
 };
 
-export const Todos: FC<Props> = ({ todos }) => {
-  const { addTodo, changeStatusTodo } = useAppActions();
-  const [startAddTransition, adding] = useTransition({
-    timeoutMs: 10000,
-  });
-  const handleAddTodo = useCallback(
-    (value: string) => {
-      addTodo(value, startAddTransition);
-    },
-    [addTodo, startAddTransition],
-  );
-  const [startChangeStatusTransition, changing] = useTransition({ timeoutMs: 10000 });
-  const handleChangeStatus = useCallback((id: string, done: boolean) => {
-    changeStatusTodo({ id, done, startTransition: startChangeStatusTransition });
-  }, []);
-
-  return (
-    <ul css={listStyle}>
-      <AddTodo onSubmit={handleAddTodo} adding={adding} />
-      {todos.map((todo) => (
-        <Item key={todo.id} todo={todo} onCheck={handleChangeStatus} changing={changing} />
-      ))}
-    </ul>
-  );
-};
+export const Todos: FC<Props> = ({ todos }) => (
+  <ul css={listStyle}>
+    <AddTodo />
+    {todos.map((todo) => (
+      <Item key={todo.id} todo={todo} />
+    ))}
+  </ul>
+);
 
 const listStyle = (theme: Theme) => css`
   > li + li {

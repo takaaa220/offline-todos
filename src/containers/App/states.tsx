@@ -9,6 +9,7 @@ import {
   useTransition,
   TransitionStartFunction,
 } from "react";
+import { TRANSITION_CONFIG } from "~/constants";
 
 export type AppPage =
   | {
@@ -50,9 +51,7 @@ const manageAppStates = () => {
 
   const useAppStates = () => {
     const [state, setState] = useState<AppState>(initialState());
-    const [startTransition, isPending] = useTransition({
-      timeoutMs: 10000,
-    });
+    const [startTransition, isPending] = useTransition(TRANSITION_CONFIG);
 
     const handleChange = useCallback<UpdateFunction>(
       (updater, transition = false) => {
@@ -97,16 +96,13 @@ const manageAppStates = () => {
         });
 
         startTransition(() => {
-          setState(
-            (state) => ({
-              ...state,
-              page: {
-                type: "todos",
-                todosFetcher,
-              },
-            }),
-            true,
-          );
+          setState((state) => ({
+            ...state,
+            page: {
+              type: "todos",
+              todosFetcher,
+            },
+          }));
         });
       },
       changeStatusTodo: async ({
@@ -133,7 +129,7 @@ const manageAppStates = () => {
                 todosFetcher,
               },
             };
-          }, true);
+          });
         });
       },
     };

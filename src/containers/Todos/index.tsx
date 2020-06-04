@@ -11,7 +11,15 @@ type Props = {
 export const TodosPage: FC<Props> = ({ todosFetcher }) => {
   const todos = todosFetcher.get();
   const sortedTodos = useMemo(
-    () => [...todos.filter((todo) => !todo.done), ...todos.filter((todo) => todo.done)],
+    () =>
+      todos.sort((a, b) => {
+        if (a.done < b.done) return -1;
+        if (a.done > b.done) return 1;
+        if (a.createdAt > b.createdAt) return -1;
+        if (a.createdAt < b.createdAt) return 1;
+
+        return 0;
+      }),
     [todos],
   );
 

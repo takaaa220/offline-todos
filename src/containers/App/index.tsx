@@ -1,8 +1,9 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, Suspense } from "react";
 import { useThemeMode } from "~/components/ThemeProvider";
 import { useAppStates } from "./states";
 import { TopPage } from "../Top";
 import { TodosPage } from "../Todos";
+import { FixedLoader } from "~/components/Loader";
 
 export const App: FC = () => {
   const { setMode } = useThemeMode();
@@ -17,10 +18,12 @@ export const App: FC = () => {
 
   return (
     <Provider>
-      <main>
-        {state.page.type === "top" && <TopPage />}
-        {state.page.type === "todos" && <TodosPage todosFetcher={state.page.todosFetcher} />}
-      </main>
+      <Suspense fallback={<FixedLoader />}>
+        <main>
+          {state.page.type === "top" && <TopPage />}
+          {state.page.type === "todos" && <TodosPage todosFetcher={state.page.todosFetcher} />}
+        </main>
+      </Suspense>
     </Provider>
   );
 };

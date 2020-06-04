@@ -10,6 +10,8 @@ export type Todo = {
   id: string;
   value: string;
   done: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export const getTodos = async (): Promise<Todo[]> => {
@@ -25,8 +27,7 @@ export const getTodos = async (): Promise<Todo[]> => {
     const req: IDBRequest<Todo[]> = index.getAll();
 
     req.onsuccess = () => {
-      console.log("success get todos");
-      setTimeout(() => resolve(req.result), 1000);
+      resolve(req.result);
     };
   });
 };
@@ -66,6 +67,7 @@ export const changeStatusTodos = async (id: Todo["id"], done: Todo["done"]): Pro
     const newTodo = {
       ...todo,
       done,
+      updatedAt: new Date(),
     };
 
     const req: IDBRequest = store.put(newTodo);
@@ -85,10 +87,13 @@ export const addTodo = async (value: string): Promise<Todo> => {
     transaction.onerror = reject;
     const store = transaction.objectStore(todoStore.name);
 
+    const now = new Date();
     const newTodo: Todo = {
       id: uuidv4(),
       value,
       done: false,
+      createdAt: now,
+      updatedAt: now,
     };
 
     const req: IDBRequest = store.put(newTodo);
