@@ -12,6 +12,8 @@ const app = css`
   body {
     font-size: 1.6rem;
     line-height: 1.8;
+    font-family: "Noto Sans JP", "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "メイリオ",
+      Meiryo, "ＭＳ Ｐゴシック", sans-serif;
   }
 `;
 
