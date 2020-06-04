@@ -3,7 +3,7 @@ import { todoStore } from "./todo";
 
 let dbCache: IDBDatabase | undefined;
 
-export const openDb = (): Promise<IDBDatabase> => {
+const openDb = (): Promise<IDBDatabase> => {
   if (dbCache) {
     return Promise.resolve(dbCache);
   }
@@ -36,3 +36,20 @@ const defineSchema = (db: IDBDatabase) => {
   const todoDB = db.createObjectStore(todoStore.name, { keyPath: "id" });
   todoDB.createIndex(todoStore.idIndex, "id");
 };
+
+export class Database {
+  private db: IDBDatabase | undefined;
+
+  constructor() {
+    openDb().then((db) => {
+      this.db = db;
+    });
+  }
+
+  async getDb(): Promise<IDBDatabase> {
+    if (this.db) return this.db;
+    this.db = await openDb();
+
+    return this.db;
+  }
+}

@@ -1,5 +1,5 @@
 import { Fetcher } from "~/helpers/fetcher";
-import { Todo, getTodos, addTodo, changeStatusTodos } from "~/db/todo";
+import { Todo, TodoDB } from "~/db/todo";
 import {
   useState,
   useContext,
@@ -84,15 +84,15 @@ const manageAppStates = () => {
           ...state,
           page: {
             type: "todos",
-            todosFetcher: new Fetcher(getTodos),
+            todosFetcher: new Fetcher(TodoDB.getAll),
           },
         }));
       },
       addTodo: async (value: string, startTransition: TransitionStartFunction) => {
         const todosFetcher = new Fetcher(async () => {
-          await addTodo(value);
+          await TodoDB.create({ value });
 
-          return getTodos();
+          return TodoDB.getAll();
         });
 
         startTransition(() => {
@@ -115,9 +115,9 @@ const manageAppStates = () => {
         startTransition: TransitionStartFunction;
       }) => {
         const todosFetcher = new Fetcher(async () => {
-          await changeStatusTodos(id, done);
+          await TodoDB.update(id, { done });
 
-          return getTodos();
+          return TodoDB.getAll();
         });
 
         startTransition(() => {

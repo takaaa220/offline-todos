@@ -1,4 +1,4 @@
-import { openDb } from ".";
+import { Database } from ".";
 import { v4 as uuidv4 } from "uuid";
 
 export const todoStore = {
@@ -14,92 +14,104 @@ export type Todo = {
   updatedAt: Date;
 };
 
-export const getTodos = async (): Promise<Todo[]> => {
-  const db = await openDb();
-  console.log("open db");
+class TodoDatabase extends Database {
+  constructor() {
+    super();
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(todoStore.name, "readonly");
-    transaction.onerror = reject;
+    this.getDb = this.getDb.bind(this);
+    this.getAll = this.getAll.bind(this);
+    this.create = this.create.bind(this);
+    this.update = this.update.bind(this);
+  }
 
-    const store = transaction.objectStore(todoStore.name);
-    const index = store.index(todoStore.idIndex);
-    const req: IDBRequest<Todo[]> = index.getAll();
+  async getAll(): Promise<Todo[]> {
+    const db = await this.getDb();
 
-    req.onsuccess = () => {
-      resolve(req.result);
-    };
-  });
-};
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(todoStore.name, "readonly");
+      transaction.onerror = reject;
 
-const getTodo = async (id: Todo["id"]): Promise<Todo> => {
-  const db = await openDb();
+      const store = transaction.objectStore(todoStore.name);
+      const index = store.index(todoStore.idIndex);
+      const req: IDBRequest<Todo[]> = index.getAll();
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(todoStore.name, "readwrite");
-    transaction.onerror = reject;
+      req.onsuccess = () => {
+        resolve(req.result);
+      };
+    });
+  }
 
-    const store = transaction.objectStore(todoStore.name);
+  private async get(id: Todo["id"]): Promise<Todo> {
+    const db = await this.getDb();
 
-    const req: IDBRequest<Todo | undefined> = store.get(id);
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(todoStore.name, "readwrite");
+      transaction.onerror = reject;
 
-    req.onsuccess = () => {
-      if (!req.result) {
-        reject("not found");
-        return;
-      }
+      const store = transaction.objectStore(todoStore.name);
 
-      resolve(req.result);
-    };
-  });
-};
+      const req: IDBRequest<Todo | undefined> = store.get(id);
 
-export const changeStatusTodos = async (id: Todo["id"], done: Todo["done"]): Promise<Todo> => {
-  const db = await openDb();
-  const todo = await getTodo(id);
+      req.onsuccess = () => {
+        if (!req.result) {
+          reject("not found");
+          return;
+        }
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(todoStore.name, "readwrite");
-    transaction.onerror = reject;
+        resolve(req.result);
+      };
+    });
+  }
 
-    const store = transaction.objectStore(todoStore.name);
+  async create(args: Pick<Todo, "value">): Promise<Todo> {
+    const db = await this.getDb();
 
-    const newTodo = {
-      ...todo,
-      done,
-      updatedAt: new Date(),
-    };
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(todoStore.name, "readwrite");
+      transaction.onerror = reject;
+      const store = transaction.objectStore(todoStore.name);
 
-    const req: IDBRequest = store.put(newTodo);
+      const now = new Date();
+      const newTodo: Todo = {
+        ...args,
+        id: uuidv4(),
+        done: false,
+        createdAt: now,
+        updatedAt: now,
+      };
 
-    req.onsuccess = () => {
-      console.log("success");
-      resolve(newTodo);
-    };
-  });
-};
+      const req: IDBRequest = store.put(newTodo);
 
-export const addTodo = async (value: string): Promise<Todo> => {
-  const db = await openDb();
+      req.onsuccess = () => {
+        resolve(newTodo);
+      };
+    });
+  }
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(todoStore.name, "readwrite");
-    transaction.onerror = reject;
-    const store = transaction.objectStore(todoStore.name);
+  async update(id: Todo["id"], args: Partial<Pick<Todo, "done" | "value">>): Promise<Todo> {
+    const db = await this.getDb();
+    const todo = await this.get(id);
+    if (!args) Promise.resolve(todo);
 
-    const now = new Date();
-    const newTodo: Todo = {
-      id: uuidv4(),
-      value,
-      done: false,
-      createdAt: now,
-      updatedAt: now,
-    };
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(todoStore.name, "readwrite");
+      transaction.onerror = reject;
 
-    const req: IDBRequest = store.put(newTodo);
+      const store = transaction.objectStore(todoStore.name);
 
-    req.onsuccess = () => {
-      resolve(newTodo);
-    };
-  });
-};
+      const newTodo = {
+        ...todo,
+        ...args,
+        updatedAt: new Date(),
+      };
+
+      const req: IDBRequest = store.put(newTodo);
+
+      req.onsuccess = () => {
+        resolve(newTodo);
+      };
+    });
+  }
+}
+
+export const TodoDB = new TodoDatabase();
